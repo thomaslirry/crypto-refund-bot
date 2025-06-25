@@ -1,7 +1,8 @@
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-TOKEN = "7128536142:AAE63mN10B2PAyLmhPnohPZzDY62XGXfX-E"
+import os
+TOKEN = os.getenv("TOKEN")
 
 # Keyboard options
 main_menu = [["Check Eligibility", "FAQ"], ["Talk to Support"]]
