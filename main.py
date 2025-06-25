@@ -2,7 +2,8 @@ from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 from keep_alive import keep_alive
 
-TOKEN = "YOUR_BOT_TOKEN"
+import os
+TOKEN = os.getenv("TOKEN")
 
 main_menu = [["Check Eligibility", "FAQ"], ["Talk to Support"]]
 
