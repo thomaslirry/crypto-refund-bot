@@ -1,72 +1,45 @@
-import os
 from telegram import Update, ReplyKeyboardMarkup
-from telegram.ext import (
-    ApplicationBuilder,
-    CommandHandler,
-    MessageHandler,
-    ContextTypes,
-    filters,
-)
-from keep_alive import keep_alive
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-# Load token securely from environment variable
-TOKEN = os.environ["TOKEN"]
+TOKEN = "7128536142:AAE63mN10B2PAyLmhPnohPZzDY62XGXfX-E"
 
-user_state = {}
-
-# Main keyboard menu
+# Keyboard options
 main_menu = [["Check Eligibility", "FAQ"], ["Talk to Support"]]
 
-# /start command handler
+# Start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user.first_name
-    reply_markup = ReplyKeyboardMarkup(
-        main_menu, one_time_keyboard=True, resize_keyboard=True
-    )
+    reply_markup = ReplyKeyboardMarkup(main_menu, one_time_keyboard=True, resize_keyboard=True)
     await update.message.reply_text(
-        f"Hello {user}, welcome to the General Refund Portal.\nPlease choose an option below 👇",
+        f"Hello {user}, welcome to the General Refund Support Desk.\n\nChoose an option below to get started 👇",
         reply_markup=reply_markup
     )
 
-# Message handler logic
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text.lower()
-    user_id = update.effective_user.id
+# Check Eligibility handler
+async def check_eligibility(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Please enter the total amount you spent on digital assets over the past few years:")
 
-    if "eligibility" in text:
-        await update.message.reply_text("Were you active in digital transactions between 2018 and 2023? (Yes/No)")
-    elif text == "yes":
-        await update.message.reply_text("Great! Please estimate how much you’ve spent in total (approximate value).")
-        user_state[user_id] = "awaiting_amount"
-    elif text == "no":
-        await update.message.reply_text("No problem. If things change, feel free to check again.")
-    elif user_state.get(user_id) == "awaiting_amount":
-        user_state.pop(user_id)
-        await update.message.reply_text(
-            "Thank you. Based on your total, you may need to deposit a verification amount (about 20–30%) to initiate the refund process.\n\nWould you like to proceed?"
-        )
-    elif "faq" in text:
-        await update.message.reply_text(
-            "🔹 *FAQs*\n\n"
-            "• Who is eligible?\n"
-            "  Anyone who used digital assets from 2018–2023.\n\n"
-            "• What do I need?\n"
-            "  Only your original wallet or a verified transaction record.\n\n"
-            "• Is there a fee?\n"
-            "  There may be a verification deposit, fully refundable.\n\n"
-            "Type 'Talk to Support' if you need help."
-        )
-    elif "support" in text:
-        await update.message.reply_text("Our support team will connect with you shortly. Please standby.")
-    else:
-        await update.message.reply_text("Please select one of the menu options to proceed.")
+# FAQ handler
+async def faq(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "FAQs:\n\n1. What is this refund for?\n-> It's a refund process for qualified digital wallet users.\n\n"
+        "2. Do I need to pay anything?\n-> You’ll only be asked to deposit a refundable % to verify the wallet.\n\n"
+        "3. Is this legit?\n-> Yes. Verification is tied to the chain's records and compliance."
+    )
 
-# Run bot
-if __name__ == "__main__":
-    keep_alive()
+# Talk to Support handler
+async def talk_to_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("A support assistant will connect with you shortly. Please standby...")
 
+# Main bot setup
+def main():
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    
+    app.add_handler(MessageHandler(filters.Regex("Check Eligibility"), check_eligibility))
+    app.add_handler(MessageHandler(filters.Regex("FAQ"), faq))
+    app.add_handler(MessageHandler(filters.Regex("Talk to Support"), talk_to_support))
+
     app.run_polling()
+
+if __name__ == "__main__":
+    main()
